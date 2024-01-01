@@ -1,0 +1,26 @@
+# deploy_nginx.yml
+---
+- hosts: your_eks_cluster
+  become: true
+  roles:
+    - install_nginx
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Expose Nginx Service
+      k8s:
+        state: present
+        definition: |
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nginx-service
+            namespace: your-namespace
+          spec:
+            selector:
+              app: nginx
+            ports:
+              - protocol: TCP
+                port: 80
+                targetPort: 80
